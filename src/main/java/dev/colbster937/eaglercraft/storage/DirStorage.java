@@ -115,7 +115,7 @@ public class DirStorage {
         String path = file.getPath().substring(subpath);
         if (ScuffedUtils.isStringEmpty(path))
           continue;
-        updateProgress(prog, HString.format("Zipping '%s'", path.substring(1)),
+        updateProgress(prog, HString.format("Zipping '%s'", path.substring(1), path.substring(1)),
             (int) Math.round((++i * 100.0) / files.size()));
         zos.putNextEntry(new ZipEntry(path));
         zos.write(file.getAllBytes());
@@ -150,10 +150,12 @@ public class DirStorage {
     int i = 0;
     updateProgress(prog, "Deleting Files");
     for (VFile2 file : files) {
-      updateProgress(prog, HString.format("Deleting '%s'", file.getPath().substring(subpath + 1)),
-          (int) Math.round((++i * 100.0) / files.size()));
-      if (file.exists())
-        file.delete();
+      if (file.getPath().startsWith(_root.getPath() + "/")) {
+        updateProgress(prog, HString.format("Deleting '%s'", file.getPath().substring(subpath + 1)),
+            (int) Math.round((++i * 100.0) / files.size()));
+        if (file.exists())
+          file.delete();
+      }
     }
     removeFromManifest(name);
   }
@@ -196,12 +198,10 @@ public class DirStorage {
         else
           prog.displayLoadingString(title);
       }
-      if (!ScuffedUtils.isStringEmpty(text)) {
+      if (!ScuffedUtils.isStringEmpty(text))
         prog.displayLoadingString(text);
-      }
-      if (perc != -2) {
+      if (perc != -2)
         prog.setLoadingProgress(perc);
-      }
     }
   }
 
